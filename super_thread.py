@@ -12,18 +12,20 @@ class SuperThread(threading.Thread):
         self.setDaemon(True)
         SuperThread.active_threads.append(self)
 
-    def __del__(self):
-        del self
-
     def get_id(self):
         # Returns Id of The Respective Thread
         return self.ident
 
     @staticmethod
     def terminate_by_name(name):
+        temp_active_threads = []
+        # Temporary List
         for thread in SuperThread.active_threads:
             if thread.name == name:
-                thread.terminate()
+                temp_active_threads.append(thread)
+        # Terminate
+        for thread in temp_active_threads:
+            thread.terminate()
 
     @staticmethod
     def terminate_all():
@@ -37,7 +39,6 @@ class SuperThread(threading.Thread):
         res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(id), ctypes.py_object(SystemExit))
         if res > 1:
             ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(id), 0)
-        self.__del__()
 
     def run(self):
         self.method()
